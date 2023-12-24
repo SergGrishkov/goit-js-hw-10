@@ -47,9 +47,10 @@ buttonEl.addEventListener('click', () => {
   if (intervalId) {
     clearInterval(intervalId);
   }
+  inputEl.style.background = '#F5F5F5';
+  buttonEl.disabled = true;
+
   intervalId = setInterval(() => {
-    inputEl.style.background = '#F5F5F5';
-    buttonEl.disabled = true;
     userSelectedDate = userSelectedDate - 1000;
     let newTime = convertMs(userSelectedDate);
     renderTime(newTime);
