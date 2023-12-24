@@ -1,0 +1,91 @@
+import flatpickr from 'flatpickr';
+import izitoast from 'izitoast';
+import 'flatpickr/dist/flatpickr.min.css';
+import 'izitoast/dist/css/iziToast.min.css';
+
+const inputEl = document.querySelector('input[type="text"]');
+const buttonEl = document.querySelector('button[type="button"]');
+const dayEl = document.querySelector('[data-days]');
+const hourEl = document.querySelector('[data-hours]');
+const minEl = document.querySelector('[data-minutes]');
+const secEl = document.querySelector('[data-seconds]');
+
+let userSelectedDate;
+let intervalId;
+
+const options = {
+  enableTime: true,
+  time_24hr: true,
+  defaultDate: new Date(),
+  minuteIncrement: 1,
+  onClose(selectedDates) {
+    if (new Date(selectedDates[0]).valueOf() < new Date().valueOf()) {
+      izitoast.error({
+        position: 'topRight',
+        message: 'Please choose a date in the future',
+      });
+      buttonEl.disabled = true;
+    } else {
+      inputEl.style.background = '#FFFFFF';
+      buttonEl.disabled = false;
+      userSelectedDate =
+        new Date(selectedDates[0]).valueOf() - new Date().valueOf();
+      if (intervalId) {
+        clearInterval(intervalId);
+      }
+    }
+  },
+};
+
+flatpickr(inputEl, options);
+
+document.addEventListener('DOMContentLoaded', () => {
+  buttonEl.disabled = true;
+});
+
+buttonEl.addEventListener('click', () => {
+  if (intervalId) {
+    clearInterval(intervalId);
+  }
+  intervalId = setInterval(() => {
+    inputEl.style.background = '#F5F5F5';
+    buttonEl.disabled = true;
+    userSelectedDate = userSelectedDate - 1000;
+    let newTime = convertMs(userSelectedDate);
+    renderTime(newTime);
+    if (newTime.days + newTime.hours + newTime.minutes + newTime.seconds <= 0) {
+      clearInterval(intervalId);
+      inputEl.style.background = '#FFFFFF';
+    }
+  }, 1000);
+});
+
+function convertMs(ms) {
+  // Number of milliseconds per unit of time
+  const second = 1000;
+  const minute = second * 60;
+  const hour = minute * 60;
+  const day = hour * 24;
+
+  // Remaining days
+  const days = Math.floor(ms / day);
+  // Remaining hours
+  const hours = Math.floor((ms % day) / hour);
+  // Remaining minutes
+  const minutes = Math.floor(((ms % day) % hour) / minute);
+  // Remaining seconds
+  const seconds = Math.floor((((ms % day) % hour) % minute) / second);
+
+  return { days, hours, minutes, seconds };
+}
+
+function addLeadingZero(value) {
+  return String(value).padStart(2, '0');
+}
+
+function renderTime(newTime) {
+  dayEl.textContent = addLeadingZero(newTime.days);
+  hourEl.textContent = addLeadingZero(newTime.hours);
+  minEl.textContent = addLeadingZero(newTime.minutes);
+  secEl.textContent = addLeadingZero(newTime.seconds);
+}
