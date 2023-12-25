@@ -7,13 +7,7 @@ const radioEl = document.querySelectorAll('input[type="radio"]');
 formEl.addEventListener('submit', e => {
   e.preventDefault();
   const delay = formEl.elements.delay.value;
-  let radioValue;
-
-  radioEl.forEach(r => {
-    if (r.checked) {
-      radioValue = r.value === 'fulfilled' ? true : false;
-    }
-  });
+  let radioValue = formEl.elements.state.value === 'fulfilled' ? true : false;
 
   const promise = new Promise((res, rej) => {
     setTimeout(() => {
