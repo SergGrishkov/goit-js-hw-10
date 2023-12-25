@@ -12,6 +12,7 @@ const secEl = document.querySelector('[data-seconds]');
 
 let userSelectedDate;
 let intervalId;
+let convertTime;
 
 const options = {
   enableTime: true,
@@ -47,14 +48,16 @@ buttonEl.addEventListener('click', () => {
   if (intervalId) {
     clearInterval(intervalId);
   }
+  convertTime = convertMs(userSelectedDate);
+  renderTime(convertTime);
   inputEl.style.background = '#F5F5F5';
   buttonEl.disabled = true;
 
   intervalId = setInterval(() => {
     userSelectedDate = userSelectedDate - 1000;
-    let newTime = convertMs(userSelectedDate);
-    renderTime(newTime);
-    if (newTime.days + newTime.hours + newTime.minutes + newTime.seconds <= 0) {
+    convertTime = convertMs(userSelectedDate);
+    renderTime(convertTime);
+    if (Object.values(convertTime).reduce((a, b) => a + b, 0) <= 0) {
       clearInterval(intervalId);
       inputEl.style.background = '#FFFFFF';
     }
